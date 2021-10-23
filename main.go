@@ -1,13 +1,14 @@
 package main
 
 import (
+	"encoding/json"
+	"github.com/aldor007/purge-api/cache"
 	"io/ioutil"
 	"log"
-	"github.com/aldor007/purge-api/cache"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
-	"encoding/json"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -16,6 +17,18 @@ import (
 func main() {
 
 	purger := cache.NewPurger()
+
+	if os.Getenv("STRAPI_REDIS") != "" {
+		redisDB, err :=  strconv.Atoi(os.Getenv("STRAPI_REDIS_DB"))
+		if err != nil {
+			panic(err)
+		}
+		purger.AddCache(cache.NewApolloStrapiRedis(cache.ApolloStrapiConfig{
+			RedisEndpoint: os.Getenv("STRAPI_REDIS"),
+			RedisDB:   redisDB,
+		}))
+
+	}
 	purger.AddCache(cache.NewNginx(cache.NginxPurgeConfig{
 		PurgeMethod: "PURGE",
 		URL:         os.Getenv("NGINX_URL"),
