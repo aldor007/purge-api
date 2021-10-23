@@ -77,7 +77,7 @@ func main()  {
 		},
 		cli.StringFlag{
 			Name: "password",
-			Value: "fo-123-qwe",
+			Value: "123-qwe",
 			Usage: "API address",
 			Destination: &password,
 		},
