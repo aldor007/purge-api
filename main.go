@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/aldor007/purge-api/cache"
 	"io/ioutil"
 	"log"
@@ -78,32 +79,40 @@ func main() {
 			w.WriteHeader(400)
 			return
 		}
-		purgeData := make(map[string]string)
+		purgeData := make(map[string][]string)
 		err = json.Unmarshal(body, &purgeData)
 		if err != nil {
 			log.Println("Parse error", err)
 			w.WriteHeader(400)
 			return
 		}
-		toPurge, ok:= purgeData["url"]
+		toPurgeUrls, ok:= purgeData["urls"]
 		if !ok {
 			log.Println("No url key")
 			w.WriteHeader(400)
 			return
 		}
-		if toPurge == "" {
-			log.Println("url empty")
+		if len(toPurgeUrls) == 0 {
+			log.Println("urls empty")
 			w.WriteHeader(400)
 			return
 		}
 
-		err = purger.Purge(r.Context(), toPurge)
-		if err != nil{
-			log.Println("Err purge", toPurge, err)
-			w.WriteHeader(500)
-			return
+		errs := make([]error, 0)
+		for _, toPurge := range toPurgeUrls {
+			err = purger.Purge(r.Context(), toPurge)
+			if err != nil{
+				log.Println("Err purge", toPurge, err)
+				errs = append(errs, err)
+			}
+
 		}
-		w.WriteHeader(200)
+		if len(errs) == 0 {
+			w.WriteHeader(202)
+		} else {
+			w.WriteHeader(500)
+			fmt.Fprint(w, errs)
+		}
 	})
 	r.Mount("/purge", purgeRouter)
 	srv := &http.Server{
