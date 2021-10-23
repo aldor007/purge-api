@@ -42,14 +42,15 @@ func main() {
 		panic(err)
 	}
 	purger.AddCache(cf)
-
 	r := chi.NewRouter()
-	r.Use(middleware.Logger)
-	r.Use(middleware.BasicAuth("purge-api", map[string]string{"api": os.Getenv("API_KEY")}))
 	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("welcome"))
 	})
-	r.Get("/purge", func(w http.ResponseWriter, r *http.Request) {
+
+	purgeRouter := chi.NewRouter()
+	purgeRouter.Use(middleware.Logger)
+	purgeRouter.Use(middleware.BasicAuth("purge-api", map[string]string{"api": os.Getenv("API_KEY")}))
+	purgeRouter.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		toPurge := r.URL.Query().Get("url")
 		if toPurge == "" {
 			w.WriteHeader(400)
@@ -64,7 +65,7 @@ func main() {
 		}
 		w.WriteHeader(200)
 	})
-	r.Post("/purge", func(w http.ResponseWriter, r *http.Request) {
+	purgeRouter.Post("/", func(w http.ResponseWriter, r *http.Request) {
 		if r.Body == nil {
 			w.WriteHeader(400)
 			return
@@ -104,6 +105,7 @@ func main() {
 		}
 		w.WriteHeader(200)
 	})
+	r.Mount("/purge", purgeRouter)
 	srv := &http.Server{
 		Addr:         ":8080",
 		// Good practice to set timeouts to avoid Slowloris attacks.
