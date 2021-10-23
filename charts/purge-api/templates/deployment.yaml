@@ -1,3 +1,4 @@
+{{ $fullName := include "purge-api.fullname" . }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -35,16 +36,26 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
-              containerPort: 80
+              containerPort: 8080
               protocol: TCP
           livenessProbe:
             httpGet:
-              path: /
+              path: /health
               port: http
           readinessProbe:
             httpGet:
-              path: /
+              path: /health
               port: http
+          {{ - if .Values.secrets.enabled }}
+          env:
+            {{ - range $key, $value := .Values.secrets.env }}
+            - name: {{ $key } }
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ $fullName }}-env-secrets"
+                  key: {{ $key }}
+            {{- end }}
+          {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}

@@ -52,6 +52,17 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
+
+secrets:
+  enabled: true
+  env:
+    API_KEY: foqwe
+    NGINX_URL: http://10.8.0.50
+    CF_API_KEY: key
+    CF_API_EMAIL: something@at.com
+    CF_ZONE_ID: zoneID
+    STRAPI_REDIS: localhost:6666
+    STRAPI_DB: 6
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
