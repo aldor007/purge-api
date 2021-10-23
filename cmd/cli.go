@@ -32,7 +32,7 @@ func callAPI(method, url string, body io.Reader) (*http.Response, error) {
 			ExpectContinueTimeout: 1 * time.Second,
 		},
 	}
-
+	color.Blue("Calling %s", url)
 	req, err := http.NewRequest(method, url, body)
 	req.SetBasicAuth(user, password)
 	if err != nil {
@@ -60,7 +60,7 @@ func main()  {
 	app.Flags = []cli.Flag {
 		cli.StringFlag{
 			Name: "api",
-			Value: "https://api.mkaciuba.com/v2",
+			Value: "http://purge-api.k8s.m39",
 			Usage: "API address",
 			Destination: &apiAddress,
 		},
@@ -77,7 +77,7 @@ func main()  {
 		},
 		cli.StringFlag{
 			Name: "password",
-			Value: "api",
+			Value: "fo-123-qwe",
 			Usage: "API address",
 			Destination: &password,
 		},
@@ -101,7 +101,7 @@ func main()  {
 					headers[parts[0]] = parts[1]
 				}
 
-				res, err := callAPI("PURGE", apiAddress + "/purge", bytes.NewReader(body))
+				res, err := callAPI("POST", apiAddress + "/purge", bytes.NewReader(body))
 				if err != nil {
 					return err
 				}

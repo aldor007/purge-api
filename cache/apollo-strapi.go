@@ -60,7 +60,7 @@ func (a *ApolloStrapiRedis) Purge(ctx context.Context,urlToPurge string) error  
 	}
 
 	var ext apolloExt
-	err = json.Unmarshal([]byte(exts), ext)
+	err = json.Unmarshal([]byte(exts), &ext)
 	if err != nil {
 		return err
 	}
