@@ -37,7 +37,11 @@ func NewMKaciubaFront(endpoint string, apiKey string) *mkaciubaFront {
 }
 
 func (n *mkaciubaFront) createPurgeRe(ctx context.Context, url string, headers map[string]string) (*http.Request, error) {
-	req, err := http.NewRequestWithContext(ctx, "DELETE", n.endpoint, nil)
+	toPurge := strings.Replace(url, "https://mkaciuba.pl", "", 1)
+	if !strings.HasPrefix(toPurge, "/" ) {
+		toPurge = "/" + toPurge
+	}
+	req, err := http.NewRequestWithContext(ctx, "DELETE", n.endpoint + "?path=" + toPurge , nil)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +50,6 @@ func (n *mkaciubaFront) createPurgeRe(ctx context.Context, url string, headers m
 		req.Header.Set(k, v)
 	}
 	req.Header.Set("x-api-key", n.apiKey)
-	req.URL.Query().Set("path", url)
 
 	return  req, nil
 }
@@ -64,7 +67,7 @@ func (n *mkaciubaFront) Purge(ctx context.Context, url string) error  {
 				errorsChan <- err
 			}
 
-			log.Println("mkaciubaFront purge", url, res.StatusCode, req.Header)
+			log.Println("mkaciubaFront purge", url, res.StatusCode, req.Header, req.URL.String())
 			if res.StatusCode != 201 && res.StatusCode != 404 {
 
 				errorsChan <- errors.New(fmt.Sprintf("http error %d", res.StatusCode))

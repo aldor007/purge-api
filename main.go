@@ -33,19 +33,24 @@ func main() {
 	if os.Getenv("MKACIUBA_FRONT_API") != "" {
 		purger.AddCache(cache.NewMKaciubaFront(os.Getenv("MKACIUBA_FRONT_API"), os.Getenv("MKACIUBA_FRONT_API_KEY")))
 	}
-	purger.AddCache(cache.NewNginx(cache.NginxPurgeConfig{
-		PurgeMethod: "PURGE",
-		URL:         os.Getenv("NGINX_URL"),
-	}))
-	cf, err := cache.NewCloudflare(cache.CloudflareConfig{
-		APIKey:   os.Getenv("CF_API_KEY"),
-		APIEmail: os.Getenv("CF_API_EMAIL"),
-		ZoneID:   os.Getenv("CF_ZONE_ID"),
-	})
-	if err != nil {
-		panic(err)
+	if os.Getenv("NGINX_URL") != "" {
+		purger.AddCache(cache.NewNginx(cache.NginxPurgeConfig{
+			PurgeMethod: "PURGE",
+			URL:         os.Getenv("NGINX_URL"),
+		}))
 	}
-	purger.AddCache(cf)
+	if os.Getenv("CF_API_KEY") != "" {
+		cf, err := cache.NewCloudflare(cache.CloudflareConfig{
+			APIKey:   os.Getenv("CF_API_KEY"),
+			APIEmail: os.Getenv("CF_API_EMAIL"),
+			ZoneID:   os.Getenv("CF_ZONE_ID"),
+		})
+		if err != nil {
+			panic(err)
+		}
+		purger.AddCache(cf)
+	}
+
 	r := chi.NewRouter()
 	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("welcome"))
