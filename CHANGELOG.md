@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/aldor007/purge-api/compare/v1.0.0...v1.0.1) (2022-10-23)
+
+
+### Bug Fixes
+
+* cf purge ([e412501](https://github.com/aldor007/purge-api/commit/e4125011c067839125705df58828b77339d2bd88))
+
 # 1.0.0 (2022-10-23)
 
 
