@@ -1,0 +1,30 @@
+name: Semantic release
+
+on:
+  push:
+    branches:
+      - master
+
+concurrency:
+  group: release
+  cancel-in-progress: true
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.18
+      - name: Install
+        run: go mod download && git config --global --add safe.directory '*'
+
+      - name: Build
+        run: go build -v ./...
+
+      - run: npm install && npx semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -28,7 +28,10 @@ func main() {
 			RedisEndpoint: os.Getenv("STRAPI_REDIS"),
 			RedisDB:   redisDB,
 		}))
+	}
 
+	if os.Getenv("MKACIUBA_FRONT_API") != "" {
+		purger.AddCache(cache.NewMKaciubaFront(os.Getenv("MKACIUBA_FRONT_API"), os.Getenv("MKACIUBA_FRONT_API_KEY")))
 	}
 	purger.AddCache(cache.NewNginx(cache.NginxPurgeConfig{
 		PurgeMethod: "PURGE",

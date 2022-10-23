@@ -32,7 +32,7 @@ func NewCloudflare(config CloudflareConfig) (*Cloudflare, error) {
 
 func (c *Cloudflare) Purge(ctx context.Context,url string) error  {
 	pReq := cloudflare.PurgeCacheRequest{
-		Everything: false,
+		Everything: true,
 		Files:      []string{url},
 		Tags:       nil,
 		Hosts:      nil,
