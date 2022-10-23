@@ -51,6 +51,6 @@ jobs:
           branch: master
           # targetBranch: master
           createPR: false
-          message: 'Update mort image to ${{ steps.dockerTag.outputs.result}}'
+          message: 'Update purge-api image to ${{ steps.dockerTag.outputs.result}}'
           token: ${{ secrets.GHR_TOKEN }}
           workDir: infra
